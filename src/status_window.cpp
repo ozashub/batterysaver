@@ -161,7 +161,7 @@ void StatusWindow::show() {
 
     s_wnd = CreateWindowExW(WS_EX_TOOLWINDOW,
         L"BatterySaverStatus", L"BatterySaver Status",
-        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VSCROLL,
+        WS_OVERLAPPEDWINDOW | WS_VSCROLL,
         CW_USEDEFAULT, CW_USEDEFAULT, 500, 400,
         nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
 
