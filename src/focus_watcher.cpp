@@ -46,7 +46,7 @@ void __stdcall FocusWatcher::win_event_cb(void*, unsigned long, void* hwnd,
 
     DWORD pid = 0;
     GetWindowThreadProcessId(static_cast<HWND>(hwnd), &pid);
-    if (pid == 0) return;
+    if (pid == 0 || pid == GetCurrentProcessId()) return;
 
     s_instance->pm_.on_foreground_changed(pid);
 }
