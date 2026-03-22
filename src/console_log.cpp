@@ -79,6 +79,21 @@ void info(std::string_view msg)  { emit(LogLevel::Info, msg); }
 void warn(std::string_view msg)  { emit(LogLevel::Warn, msg); }
 void error(std::string_view msg) { emit(LogLevel::Error, msg); }
 
+static std::string narrow(std::wstring_view ws) {
+    if (ws.empty()) return {};
+    int len = WideCharToMultiByte(CP_UTF8, 0, ws.data(), static_cast<int>(ws.size()),
+        nullptr, 0, nullptr, nullptr);
+    std::string out(len, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, ws.data(), static_cast<int>(ws.size()),
+        out.data(), len, nullptr, nullptr);
+    return out;
+}
+
+void debug(std::wstring_view msg) { emit(LogLevel::Debug, narrow(msg)); }
+void info(std::wstring_view msg)  { emit(LogLevel::Info, narrow(msg)); }
+void warn(std::wstring_view msg)  { emit(LogLevel::Warn, narrow(msg)); }
+void error(std::wstring_view msg) { emit(LogLevel::Error, narrow(msg)); }
+
 void error(std::string_view msg, unsigned long win_error) {
     char buf[512];
     char err_msg[256]{};

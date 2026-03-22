@@ -109,6 +109,10 @@
     <ClCompile Include="src\mode.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\elevation.cpp" />
+    <ClCompile Include="src\process_manager.cpp" />
+    <ClCompile Include="src\focus_watcher.cpp" />
+    <ClCompile Include="src\suspension_timer.cpp" />
+    <ClCompile Include="src\whitelist.cpp" />
   </ItemGroup>
 
   <!-- Header files -->
@@ -118,6 +122,10 @@
     <ClInclude Include="src\mode.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\elevation.h" />
+    <ClInclude Include="src\process_manager.h" />
+    <ClInclude Include="src\focus_watcher.h" />
+    <ClInclude Include="src\suspension_timer.h" />
+    <ClInclude Include="src\whitelist.h" />
   </ItemGroup>
 
   <!-- Resources -->
