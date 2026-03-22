@@ -10,6 +10,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
+#include <objbase.h>
 
 #include <format>
 
@@ -29,6 +30,7 @@ App::App(LaunchMode launch)
 {
     g_app = this;
     SetUnhandledExceptionFilter(crash_handler);
+    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 }
 
 App::~App() {
@@ -40,6 +42,7 @@ App::~App() {
     if (proc_mgr_)
         proc_mgr_->resume_all();
     proc_mgr_.reset();
+    CoUninitialize();
     g_app = nullptr;
 }
 

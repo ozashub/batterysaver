@@ -54,6 +54,7 @@ bool ProcessManager::is_manageable(unsigned long pid, const std::wstring& name) 
     if (pid == 0 || pid == 4) return false;
     if (pid == GetCurrentProcessId()) return false;
     if (Whitelist::is_system_protected(name)) return false;
+    if (Whitelist::is_critical_process(pid)) return false;
 
     auto* app = app_instance();
     if (app && Whitelist::matches_user_list(name, app->settings().user_whitelist))
@@ -129,6 +130,7 @@ void ProcessManager::tick(const ModeConfig& cfg) {
         auto idle_sec = std::chrono::duration_cast<std::chrono::seconds>(
             now - tp.last_active).count();
         if (idle_sec >= cfg.suspend_threshold_sec) {
+            if (Whitelist::has_active_audio(pid)) continue;
             suspend(tp);
         }
     }
