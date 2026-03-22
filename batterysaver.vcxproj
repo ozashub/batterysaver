@@ -48,6 +48,7 @@
   <PropertyGroup>
     <IntDir>$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
 
   <!-- Debug x64 -->
@@ -148,9 +149,6 @@
   <!-- Resources -->
   <ItemGroup>
     <ResourceCompile Include="resources\BatterySaver.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="resources\BatterySaver.exe.manifest" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
