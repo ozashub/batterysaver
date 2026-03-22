@@ -118,7 +118,8 @@ void TrayIcon::update_tooltip() {
 
     auto snap = app->proc_mgr() ? app->proc_mgr()->snapshot() : decltype(app->proc_mgr()->snapshot()){};
     int active = 0, suspended = 0;
-    for (auto& [pid, tp] : snap) {
+    for (auto& [_, tp] : snap) {
+        (void)_;
         if (tp.state == ProcessState::Suspended) ++suspended;
         else ++active;
     }

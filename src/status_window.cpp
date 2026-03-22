@@ -121,6 +121,7 @@ void StatusWindow::paint(HWND hwnd) {
 }
 
 LRESULT CALLBACK StatusWindow::wnd_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+    (void)wp; (void)lp;
     switch (msg) {
     case WM_PAINT:
         paint(hwnd);

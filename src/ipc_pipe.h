@@ -7,7 +7,7 @@
 #include <thread>
 #include <atomic>
 
-static constexpr const wchar_t* PIPE_NAME = L"\\\\.\\pipe\\BatterySaverIPC";
+inline constexpr const wchar_t* PIPE_NAME = L"\\\\.\\pipe\\BatterySaverIPC";
 
 enum class IpcMsg : unsigned char {
     Ping         = 0x01,
