@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "service_host.h"
 #include "app.h"
 #include "ipc_pipe.h"

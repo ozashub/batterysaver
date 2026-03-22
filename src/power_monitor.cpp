@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "power_monitor.h"
 #include "console_log.h"
 #include "app.h"

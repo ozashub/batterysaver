@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "suspension_timer.h"
 #include "process_manager.h"
 #include "tray_icon.h"

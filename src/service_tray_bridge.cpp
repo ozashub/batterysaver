@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "service_tray_bridge.h"
 #include "console_log.h"
 

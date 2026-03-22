@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "app.h"
 #include "process_manager.h"
 #include "focus_watcher.h"

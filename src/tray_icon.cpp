@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "tray_icon.h"
 #include "power_monitor.h"
 #include "process_manager.h"

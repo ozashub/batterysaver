@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "whitelist.h"
 
 #include "platform.h"

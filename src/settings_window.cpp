@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "settings_window.h"
 #include "app.h"
 #include "console_log.h"

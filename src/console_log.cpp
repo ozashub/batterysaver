@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "console_log.h"
 
 #include "platform.h"

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "status_window.h"
 #include "process_manager.h"
 #include "power_monitor.h"

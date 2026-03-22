@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "process_manager.h"
 #include "whitelist.h"
 #include "console_log.h"
