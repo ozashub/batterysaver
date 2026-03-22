@@ -45,6 +45,7 @@ private:
     mutable std::mutex mtx_;
     std::unordered_map<unsigned long, TrackedProcess> tracked_;
     unsigned long fg_pid_ = 0;
+    std::wstring  fg_name_;
 
     void deprioritise(TrackedProcess& tp, unsigned long pclass);
     void suspend(TrackedProcess& tp);

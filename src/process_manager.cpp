@@ -99,12 +99,24 @@ bool ProcessManager::is_manageable(unsigned long pid, const std::wstring& name) 
     return true;
 }
 
+static bool name_eq(const std::wstring& a, const std::wstring& b) {
+    if (a.size() != b.size()) return false;
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (towlower(a[i]) != towlower(b[i])) return false;
+    }
+    return true;
+}
+
 void ProcessManager::on_foreground_changed(unsigned long new_fg_pid) {
     std::lock_guard lock(mtx_);
     auto now = std::chrono::steady_clock::now();
 
-    if (auto it = tracked_.find(new_fg_pid); it != tracked_.end()) {
-        auto& tp = it->second;
+    auto new_name = exe_name(new_fg_pid);
+    if (new_name.empty()) return;
+
+    // restore ALL processes with the same exe name as the new foreground
+    for (auto& [pid, tp] : tracked_) {
+        if (!name_eq(tp.name, new_name)) continue;
         if (tp.state == ProcessState::Suspended)
             resume(tp);
         if (tp.state == ProcessState::Deprioritised)
@@ -112,28 +124,25 @@ void ProcessManager::on_foreground_changed(unsigned long new_fg_pid) {
         tp.state = ProcessState::Active;
         tp.last_active = now;
         tp.state_changed = now;
-        Log::info(std::format("focus -> {} (pid {}), restored", narrow(tp.name), tp.pid));
-    } else {
-        auto name = exe_name(new_fg_pid);
-        if (!name.empty()) {
-            Log::info(std::format("focus -> {} (pid {})", narrow(name), new_fg_pid));
-        }
     }
 
+    Log::info(std::format("focus -> {} (pid {})", narrow(new_name), new_fg_pid));
+
     auto* app = app_instance();
-    if (!app) { fg_pid_ = new_fg_pid; return; }
+    if (!app) { fg_pid_ = new_fg_pid; fg_name_ = new_name; return; }
 
     auto mode = app->active_mode();
-    if (mode == Mode::Off) { fg_pid_ = new_fg_pid; return; }
+    if (mode == Mode::Off) { fg_pid_ = new_fg_pid; fg_name_ = new_name; return; }
 
     auto& cfg = app->settings().cfg_for(mode);
 
-    if (fg_pid_ != 0 && fg_pid_ != new_fg_pid) {
-        auto name = exe_name(fg_pid_);
-        if (!name.empty() && is_manageable(fg_pid_, name)) {
+    // deprioritise the old foreground (only if it's a different exe)
+    if (fg_pid_ != 0 && !name_eq(fg_name_, new_name)) {
+        auto old_name = exe_name(fg_pid_);
+        if (!old_name.empty() && is_manageable(fg_pid_, old_name)) {
             auto& tp = tracked_[fg_pid_];
             tp.pid = fg_pid_;
-            tp.name = name;
+            tp.name = old_name;
             tp.last_active = now;
             tp.state_changed = now;
             deprioritise(tp, cfg.priority_class);
@@ -141,6 +150,7 @@ void ProcessManager::on_foreground_changed(unsigned long new_fg_pid) {
     }
 
     fg_pid_ = new_fg_pid;
+    fg_name_ = new_name;
 }
 
 void ProcessManager::tick(const ModeConfig& cfg) {
@@ -152,6 +162,7 @@ void ProcessManager::tick(const ModeConfig& cfg) {
 
     for (auto& [pid, tp] : tracked_) {
         if (pid == fg_pid_) continue;
+        if (!fg_name_.empty() && name_eq(tp.name, fg_name_)) continue;
         if (tp.state == ProcessState::Suspended) continue;
 
         // verify process still exists
