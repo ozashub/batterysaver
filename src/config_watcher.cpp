@@ -2,9 +2,7 @@
 #include "settings.h"
 #include "console_log.h"
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
+#include "platform.h"
 
 ConfigWatcher::ConfigWatcher(Callback on_change) : cb_(std::move(on_change)) {}
 

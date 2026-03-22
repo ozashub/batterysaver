@@ -3,10 +3,7 @@
 #include "elevation.h"
 #include "service_host.h"
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
-
+#include "platform.h"
 #include <string_view>
 
 static constexpr const wchar_t* MUTEX_NAME = L"Global\\BatterySaverMutex";

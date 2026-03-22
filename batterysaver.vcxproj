@@ -142,6 +142,7 @@
     <ClInclude Include="src\service_host.h" />
     <ClInclude Include="src\ipc_pipe.h" />
     <ClInclude Include="src\service_tray_bridge.h" />
+    <ClInclude Include="src\platform.h" />
   </ItemGroup>
 
   <!-- Resources -->

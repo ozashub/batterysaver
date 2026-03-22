@@ -3,9 +3,7 @@
 #include "console_log.h"
 #include "app.h"
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
+#include "platform.h"
 #include <Psapi.h>
 
 #include <format>

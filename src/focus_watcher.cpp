@@ -2,9 +2,7 @@
 #include "process_manager.h"
 #include "console_log.h"
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
+#include "platform.h"
 
 static FocusWatcher* s_instance = nullptr;
 

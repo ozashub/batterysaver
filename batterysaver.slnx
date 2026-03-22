@@ -2,5 +2,5 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="batterysaver.vcxproj" />
+  <Project Path="batterysaver.vcxproj" Id="46bb40ad-b80b-480c-8ca6-bee6553be806" />
 </Solution>

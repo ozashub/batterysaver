@@ -1,6 +1,7 @@
 #include "service_tray_bridge.h"
 #include "console_log.h"
 
+#include <string>
 #include <WtsApi32.h>
 #include <userenv.h>
 
@@ -47,7 +48,6 @@ bool ServiceTrayBridge::launch_into_session(DWORD session_id) {
 
     wchar_t path[MAX_PATH]{};
     GetModuleFileNameW(nullptr, path, MAX_PATH);
-    // the tray helper is the same binary, just launched without --service
     std::wstring cmd = std::wstring(L"\"") + path + L"\"";
 
     STARTUPINFOW si{};

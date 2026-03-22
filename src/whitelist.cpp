@@ -1,8 +1,6 @@
 #include "whitelist.h"
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
+#include "platform.h"
 #include <Audiopolicy.h>
 #include <Mmdeviceapi.h>
 #include <combaseapi.h>

@@ -4,9 +4,7 @@
 #include "service_tray_bridge.h"
 #include "console_log.h"
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
+#include "platform.h"
 
 #include <format>
 #include <string>
