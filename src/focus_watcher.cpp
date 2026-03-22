@@ -21,7 +21,7 @@ bool FocusWatcher::start() {
         nullptr,
         reinterpret_cast<WINEVENTPROC>(win_event_cb),
         0, 0,
-        WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
+        WINEVENT_OUTOFCONTEXT);
 
     if (!hook_) {
         Log::error("SetWinEventHook failed", GetLastError());
@@ -46,7 +46,7 @@ void __stdcall FocusWatcher::win_event_cb(void*, unsigned long, void* hwnd,
 
     DWORD pid = 0;
     GetWindowThreadProcessId(static_cast<HWND>(hwnd), &pid);
-    if (pid == 0 || pid == GetCurrentProcessId()) return;
+    if (pid == 0) return;
 
     s_instance->pm_.on_foreground_changed(pid);
 }
