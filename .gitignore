@@ -1,32 +1,22 @@
-# Prerequisites
-*.d
+.vs/
+Debug/
+Release/
+x64/
+*.user
+*.suo
+*.ncb
+*.sdf
+*.opensdf
+*.aps
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
 *.obj
-
-# Precompiled Headers
-*.gch
 *.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
+*.pdb
+*.ilk
+*.idb
+*.exp
+*.exe
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
 *.lib
 
-# Executables
-*.exe
-*.out
-*.app
+vcpkg_installed/
