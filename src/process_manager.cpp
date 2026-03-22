@@ -36,31 +36,44 @@ bool ProcessManager::init() {
     return true;
 }
 
-void ProcessManager::scan_existing() {
-    HWND fg = GetForegroundWindow();
-    DWORD fg_pid_now = 0;
-    if (fg) GetWindowThreadProcessId(fg, &fg_pid_now);
-    fg_pid_ = fg_pid_now;
+static bool name_eq(const std::wstring& a, const std::wstring& b) {
+    if (a.size() != b.size()) return false;
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (towlower(a[i]) != towlower(b[i])) return false;
+    }
+    return true;
+}
 
+void ProcessManager::scan_existing() {
     auto* app = app_instance();
     if (!app || app->active_mode() == Mode::Off) return;
 
+    HWND fg = GetForegroundWindow();
+    DWORD fg_pid_now = 0;
+    if (fg) GetWindowThreadProcessId(fg, &fg_pid_now);
+
+    auto fg_exe = exe_name(fg_pid_now);
     auto& cfg = app->settings().cfg_for(app->active_mode());
     auto now = std::chrono::steady_clock::now();
 
-    DWORD pids[1024];
+    DWORD pids[2048];
     DWORD bytes_returned = 0;
     if (!EnumProcesses(pids, sizeof(pids), &bytes_returned)) return;
 
     DWORD count = bytes_returned / sizeof(DWORD);
+
     std::lock_guard lock(mtx_);
+    fg_pid_ = fg_pid_now;
+    fg_name_ = fg_exe;
 
     for (DWORD i = 0; i < count; ++i) {
         DWORD pid = pids[i];
         if (pid == fg_pid_now) continue;
+        if (tracked_.count(pid)) continue;
 
         auto name = exe_name(pid);
         if (name.empty() || !is_manageable(pid, name)) continue;
+        if (!fg_exe.empty() && name_eq(name, fg_exe)) continue;
 
         auto& tp = tracked_[pid];
         tp.pid = pid;
@@ -70,7 +83,7 @@ void ProcessManager::scan_existing() {
         deprioritise(tp, cfg.priority_class);
     }
 
-    Log::info(std::format("initial scan: {} processes tracked", tracked_.size()));
+    Log::info(std::format("scan: {} processes tracked", tracked_.size()));
 }
 
 std::wstring ProcessManager::exe_name(unsigned long pid) const {
@@ -96,14 +109,6 @@ bool ProcessManager::is_manageable(unsigned long pid, const std::wstring& name) 
         return false;
     if (!Whitelist::has_visible_window(pid))
         return false;
-    return true;
-}
-
-static bool name_eq(const std::wstring& a, const std::wstring& b) {
-    if (a.size() != b.size()) return false;
-    for (size_t i = 0; i < a.size(); ++i) {
-        if (towlower(a[i]) != towlower(b[i])) return false;
-    }
     return true;
 }
 
@@ -156,34 +161,42 @@ void ProcessManager::on_foreground_changed(unsigned long new_fg_pid) {
 void ProcessManager::tick(const ModeConfig& cfg) {
     if (cfg.suspend_threshold_sec <= 0) return;
 
-    std::lock_guard lock(mtx_);
-    auto now = std::chrono::steady_clock::now();
+    // re-scan for new processes each tick
+    scan_existing();
+
+    std::vector<unsigned long> to_suspend;
     std::vector<unsigned long> dead;
 
-    for (auto& [pid, tp] : tracked_) {
-        if (pid == fg_pid_) continue;
-        if (!fg_name_.empty() && name_eq(tp.name, fg_name_)) continue;
-        if (tp.state == ProcessState::Suspended) continue;
+    {
+        std::lock_guard lock(mtx_);
+        auto now = std::chrono::steady_clock::now();
 
-        // verify process still exists
-        HANDLE h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-        if (!h) {
-            dead.push_back(pid);
-            continue;
-        }
-        CloseHandle(h);
+        for (auto& [pid, tp] : tracked_) {
+            if (pid == fg_pid_) continue;
+            if (!fg_name_.empty() && name_eq(tp.name, fg_name_)) continue;
+            if (tp.state == ProcessState::Suspended) continue;
 
-        auto idle_sec = std::chrono::duration_cast<std::chrono::seconds>(
-            now - tp.last_active).count();
-        if (idle_sec >= cfg.suspend_threshold_sec) {
-            if (Whitelist::has_active_audio(pid)) continue;
-            suspend(tp);
+            HANDLE h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+            if (!h) { dead.push_back(pid); continue; }
+            CloseHandle(h);
+
+            auto idle_sec = std::chrono::duration_cast<std::chrono::seconds>(
+                now - tp.last_active).count();
+            if (idle_sec >= cfg.suspend_threshold_sec) {
+                if (!Whitelist::has_active_audio(pid))
+                    to_suspend.push_back(pid);
+            }
         }
+
+        for (auto pid : dead)
+            tracked_.erase(pid);
     }
 
-    for (auto pid : dead) {
-        Log::debug(std::format("pid {} exited, removing from tracking", pid));
-        tracked_.erase(pid);
+    // suspend outside the lock so focus changes aren't blocked
+    for (auto pid : to_suspend) {
+        std::lock_guard lock(mtx_);
+        if (auto it = tracked_.find(pid); it != tracked_.end())
+            suspend(it->second);
     }
 }
 

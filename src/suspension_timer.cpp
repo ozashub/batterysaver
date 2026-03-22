@@ -1,5 +1,6 @@
 #include "suspension_timer.h"
 #include "process_manager.h"
+#include "tray_icon.h"
 #include "app.h"
 #include "console_log.h"
 
@@ -39,6 +40,10 @@ void SuspensionTimer::loop(int interval_sec) {
 
         auto& cfg = app->settings().cfg_for(mode);
         pm_.tick(cfg);
+
+        auto* tray = app->tray();
+        if (tray && tray->hwnd())
+            PostMessage(tray->hwnd(), TrayIcon::WM_TRAY_REFRESH, 0, 0);
     }
 
     CoUninitialize();

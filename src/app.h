@@ -30,6 +30,7 @@ public:
     bool            paused() const { return paused_; }
 
     ProcessManager* proc_mgr() { return proc_mgr_.get(); }
+    TrayIcon*       tray()     { return tray_.get(); }
 
     void set_mode(Mode m);
     void set_paused(bool p);

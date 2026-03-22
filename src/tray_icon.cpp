@@ -170,6 +170,11 @@ LRESULT CALLBACK TrayIcon::wnd_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         return TRUE;
     }
 
+    if (msg == WM_TRAY_REFRESH && self) {
+        self->update_tooltip();
+        return 0;
+    }
+
     if (msg == WM_TRAYICON && self) {
         if (LOWORD(lp) == WM_RBUTTONUP)
             self->show_context_menu();

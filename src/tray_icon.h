@@ -19,8 +19,10 @@ public:
 
     HWND hwnd() const { return hwnd_; }
 
+    static constexpr UINT WM_TRAY_REFRESH = WM_USER + 2;
+
 private:
-    static constexpr UINT WM_TRAYICON = WM_USER + 1;
+    static constexpr UINT WM_TRAYICON     = WM_USER + 1;
     static constexpr UINT IDM_MODE_OFF        = 1001;
     static constexpr UINT IDM_MODE_PASSIVE    = 1002;
     static constexpr UINT IDM_MODE_BALANCED   = 1003;
