@@ -150,7 +150,7 @@
     <ResourceCompile Include="resources\BatterySaver.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="resources\BatterySaver.exe.manifest" />
+    <None Include="resources\BatterySaver.exe.manifest" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

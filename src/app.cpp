@@ -28,7 +28,7 @@ App::App(LaunchMode launch)
 {
     g_app = this;
     SetUnhandledExceptionFilter(crash_handler);
-    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    (void)CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 }
 
 App::~App() {
