@@ -45,6 +45,12 @@
     <ClCompile Include="src\whitelist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\power_monitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tray_icon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app.h">
@@ -72,6 +78,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\whitelist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\power_monitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tray_icon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

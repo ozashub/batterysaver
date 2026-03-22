@@ -113,6 +113,8 @@
     <ClCompile Include="src\focus_watcher.cpp" />
     <ClCompile Include="src\suspension_timer.cpp" />
     <ClCompile Include="src\whitelist.cpp" />
+    <ClCompile Include="src\power_monitor.cpp" />
+    <ClCompile Include="src\tray_icon.cpp" />
   </ItemGroup>
 
   <!-- Header files -->
@@ -126,6 +128,8 @@
     <ClInclude Include="src\focus_watcher.h" />
     <ClInclude Include="src\suspension_timer.h" />
     <ClInclude Include="src\whitelist.h" />
+    <ClInclude Include="src\power_monitor.h" />
+    <ClInclude Include="src\tray_icon.h" />
   </ItemGroup>
 
   <!-- Resources -->

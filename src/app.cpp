@@ -2,6 +2,8 @@
 #include "process_manager.h"
 #include "focus_watcher.h"
 #include "suspension_timer.h"
+#include "power_monitor.h"
+#include "tray_icon.h"
 #include "console_log.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -29,6 +31,8 @@ App::App(LaunchMode launch)
 }
 
 App::~App() {
+    tray_.reset();
+    power_.reset();
     timer_.reset();
     focus_.reset();
     if (proc_mgr_)
@@ -86,9 +90,17 @@ int App::run() {
     timer_ = std::make_unique<SuspensionTimer>(*proc_mgr_);
     timer_->start(settings_.timer_interval_sec);
 
+    tray_ = std::make_unique<TrayIcon>();
+    power_ = std::make_unique<PowerMonitor>();
+
+    if (tray_->create(power_.get()))
+        power_->start(tray_->hwnd());
+
     pump_messages();
 
     Log::info("shutting down");
+    tray_->destroy();
+    power_->stop();
     timer_->stop();
     focus_->stop();
     proc_mgr_->resume_all();

@@ -8,6 +8,8 @@ enum class LaunchMode { Tray, Console, Service };
 class ProcessManager;
 class FocusWatcher;
 class SuspensionTimer;
+class PowerMonitor;
+class TrayIcon;
 
 class App {
 public:
@@ -40,6 +42,8 @@ private:
     std::unique_ptr<ProcessManager>  proc_mgr_;
     std::unique_ptr<FocusWatcher>    focus_;
     std::unique_ptr<SuspensionTimer> timer_;
+    std::unique_ptr<PowerMonitor>    power_;
+    std::unique_ptr<TrayIcon>        tray_;
 
     void pump_messages();
 };
