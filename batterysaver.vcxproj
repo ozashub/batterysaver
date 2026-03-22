@@ -67,7 +67,7 @@
       <PreprocessorDefinitions>DEBUG;_DEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;UNICODE;_UNICODE;_WIN32_WINNT=0x0A00;WINVER=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>ntdll.lib;advapi32.lib;user32.lib;shell32.lib;wtsapi32.lib;powrprof.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
