@@ -3,6 +3,9 @@
 #include "app.h"
 #include "console_log.h"
 
+#include "platform.h"
+#include <objbase.h>
+
 SuspensionTimer::SuspensionTimer(ProcessManager& pm) : pm_(pm) {}
 
 SuspensionTimer::~SuspensionTimer() { stop(); }
@@ -21,6 +24,8 @@ void SuspensionTimer::stop() {
 }
 
 void SuspensionTimer::loop(int interval_sec) {
+    (void)CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
     while (running_.load()) {
         std::this_thread::sleep_for(std::chrono::seconds(interval_sec));
         if (!running_.load()) break;
@@ -35,4 +40,6 @@ void SuspensionTimer::loop(int interval_sec) {
         auto& cfg = app->settings().cfg_for(mode);
         pm_.tick(cfg);
     }
+
+    CoUninitialize();
 }

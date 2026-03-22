@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
+#include <unordered_set>
 
 #pragma comment(lib, "ole32.lib")
 
@@ -83,38 +85,42 @@ bool is_critical_process(unsigned long pid) {
     return critical != FALSE;
 }
 
-bool has_active_audio(unsigned long pid) {
-    // WASAPI audio session check — skip processes actively producing sound
+static std::unordered_set<unsigned long> s_audio_pids;
+static std::chrono::steady_clock::time_point s_audio_last;
+
+static void refresh_audio_pids() {
+    auto now = std::chrono::steady_clock::now();
+    // only refresh every 2 seconds, not per-process
+    if (std::chrono::duration_cast<std::chrono::seconds>(now - s_audio_last).count() < 2)
+        return;
+    s_audio_last = now;
+    s_audio_pids.clear();
+
     IMMDeviceEnumerator* enumerator = nullptr;
     HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr,
         CLSCTX_ALL, __uuidof(IMMDeviceEnumerator),
         reinterpret_cast<void**>(&enumerator));
-    if (FAILED(hr) || !enumerator) return false;
+    if (FAILED(hr) || !enumerator) return;
 
     IMMDevice* device = nullptr;
     hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device);
-    if (FAILED(hr) || !device) {
-        enumerator->Release();
-        return false;
-    }
+    if (FAILED(hr) || !device) { enumerator->Release(); return; }
 
     IAudioSessionManager2* mgr = nullptr;
     hr = device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL,
         nullptr, reinterpret_cast<void**>(&mgr));
     device->Release();
     enumerator->Release();
-    if (FAILED(hr) || !mgr) return false;
+    if (FAILED(hr) || !mgr) return;
 
     IAudioSessionEnumerator* sessions = nullptr;
     hr = mgr->GetSessionEnumerator(&sessions);
     mgr->Release();
-    if (FAILED(hr) || !sessions) return false;
+    if (FAILED(hr) || !sessions) return;
 
     int count = 0;
     sessions->GetCount(&count);
-    bool found = false;
-
-    for (int i = 0; i < count && !found; ++i) {
+    for (int i = 0; i < count; ++i) {
         IAudioSessionControl* ctrl = nullptr;
         if (FAILED(sessions->GetSession(i, &ctrl)) || !ctrl) continue;
 
@@ -124,19 +130,19 @@ bool has_active_audio(unsigned long pid) {
         ctrl->Release();
         if (FAILED(hr) || !ctrl2) continue;
 
-        DWORD session_pid = 0;
-        ctrl2->GetProcessId(&session_pid);
-
-        if (session_pid == pid) {
-            AudioSessionState state;
-            if (SUCCEEDED(ctrl2->GetState(&state)) && state == AudioSessionStateActive)
-                found = true;
-        }
+        AudioSessionState state;
+        DWORD spid = 0;
+        ctrl2->GetProcessId(&spid);
+        if (spid && SUCCEEDED(ctrl2->GetState(&state)) && state == AudioSessionStateActive)
+            s_audio_pids.insert(spid);
         ctrl2->Release();
     }
-
     sessions->Release();
-    return found;
+}
+
+bool has_active_audio(unsigned long pid) {
+    refresh_audio_pids();
+    return s_audio_pids.count(pid) > 0;
 }
 
 bool matches_user_list(std::wstring_view exe_name, const std::vector<std::string>& patterns) {
