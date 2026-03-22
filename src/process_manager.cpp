@@ -36,6 +36,43 @@ bool ProcessManager::init() {
     return true;
 }
 
+void ProcessManager::scan_existing() {
+    HWND fg = GetForegroundWindow();
+    DWORD fg_pid_now = 0;
+    if (fg) GetWindowThreadProcessId(fg, &fg_pid_now);
+    fg_pid_ = fg_pid_now;
+
+    auto* app = app_instance();
+    if (!app || app->active_mode() == Mode::Off) return;
+
+    auto& cfg = app->settings().cfg_for(app->active_mode());
+    auto now = std::chrono::steady_clock::now();
+
+    DWORD pids[1024];
+    DWORD bytes_returned = 0;
+    if (!EnumProcesses(pids, sizeof(pids), &bytes_returned)) return;
+
+    DWORD count = bytes_returned / sizeof(DWORD);
+    std::lock_guard lock(mtx_);
+
+    for (DWORD i = 0; i < count; ++i) {
+        DWORD pid = pids[i];
+        if (pid == fg_pid_now) continue;
+
+        auto name = exe_name(pid);
+        if (name.empty() || !is_manageable(pid, name)) continue;
+
+        auto& tp = tracked_[pid];
+        tp.pid = pid;
+        tp.name = name;
+        tp.last_active = now;
+        tp.state_changed = now;
+        deprioritise(tp, cfg.priority_class);
+    }
+
+    Log::info(std::format("initial scan: {} processes tracked", tracked_.size()));
+}
+
 std::wstring ProcessManager::exe_name(unsigned long pid) const {
     HANDLE h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
     if (!h) return {};

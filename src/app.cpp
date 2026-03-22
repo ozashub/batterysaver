@@ -84,6 +84,8 @@ int App::run() {
         return 1;
     }
 
+    proc_mgr_->scan_existing();
+
     focus_ = std::make_unique<FocusWatcher>(*proc_mgr_);
     if (!focus_->start()) {
         Log::error("focus watcher init failed");

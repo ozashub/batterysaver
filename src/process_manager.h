@@ -25,6 +25,7 @@ public:
     ProcessManager& operator=(const ProcessManager&) = delete;
 
     bool init();
+    void scan_existing();
 
     void on_foreground_changed(unsigned long new_fg_pid);
     void tick(const ModeConfig& cfg);
