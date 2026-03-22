@@ -29,6 +29,8 @@ private:
     static constexpr UINT IDM_MODE_AGGRESSIVE = 1004;
     static constexpr UINT IDM_MODE_CUSTOM     = 1005;
     static constexpr UINT IDM_PAUSE           = 1010;
+    static constexpr UINT IDM_STATUS          = 1011;
+    static constexpr UINT IDM_SETTINGS        = 1012;
     static constexpr UINT IDM_EXIT            = 1020;
 
     HWND hwnd_ = nullptr;

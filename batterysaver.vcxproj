@@ -115,6 +115,9 @@
     <ClCompile Include="src\whitelist.cpp" />
     <ClCompile Include="src\power_monitor.cpp" />
     <ClCompile Include="src\tray_icon.cpp" />
+    <ClCompile Include="src\settings_window.cpp" />
+    <ClCompile Include="src\status_window.cpp" />
+    <ClCompile Include="src\config_watcher.cpp" />
   </ItemGroup>
 
   <!-- Header files -->
@@ -130,6 +133,9 @@
     <ClInclude Include="src\whitelist.h" />
     <ClInclude Include="src\power_monitor.h" />
     <ClInclude Include="src\tray_icon.h" />
+    <ClInclude Include="src\settings_window.h" />
+    <ClInclude Include="src\status_window.h" />
+    <ClInclude Include="src\config_watcher.h" />
   </ItemGroup>
 
   <!-- Resources -->

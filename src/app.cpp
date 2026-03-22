@@ -4,6 +4,7 @@
 #include "suspension_timer.h"
 #include "power_monitor.h"
 #include "tray_icon.h"
+#include "config_watcher.h"
 #include "console_log.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -31,6 +32,7 @@ App::App(LaunchMode launch)
 }
 
 App::~App() {
+    cfg_watcher_.reset();
     tray_.reset();
     power_.reset();
     timer_.reset();
@@ -96,9 +98,18 @@ int App::run() {
     if (tray_->create(power_.get()))
         power_->start(tray_->hwnd());
 
+    cfg_watcher_ = std::make_unique<ConfigWatcher>([this] {
+        Log::info("config changed on disk, reloading");
+        settings_ = SettingsIO::load();
+        if (proc_mgr_)
+            proc_mgr_->set_mode_config(settings_.cfg_for(settings_.active_mode));
+    });
+    cfg_watcher_->start();
+
     pump_messages();
 
     Log::info("shutting down");
+    cfg_watcher_->stop();
     tray_->destroy();
     power_->stop();
     timer_->stop();

@@ -1,6 +1,8 @@
 #include "tray_icon.h"
 #include "power_monitor.h"
 #include "process_manager.h"
+#include "settings_window.h"
+#include "status_window.h"
 #include "app.h"
 #include "console_log.h"
 
@@ -170,6 +172,8 @@ LRESULT CALLBACK TrayIcon::wnd_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     if (msg == WM_TRAYICON && self) {
         if (LOWORD(lp) == WM_RBUTTONUP)
             self->show_context_menu();
+        else if (LOWORD(lp) == WM_LBUTTONUP)
+            StatusWindow::show();
         return 0;
     }
 
@@ -201,6 +205,9 @@ void TrayIcon::show_context_menu() {
     AppendMenuW(menu, MF_POPUP, reinterpret_cast<UINT_PTR>(modes), L"Mode");
     AppendMenuW(menu, MF_STRING | (app->paused() ? MF_CHECKED : 0), IDM_PAUSE, L"Pause");
     AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
+    AppendMenuW(menu, MF_STRING, IDM_STATUS, L"View Status");
+    AppendMenuW(menu, MF_STRING, IDM_SETTINGS, L"Settings");
+    AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(menu, MF_STRING, IDM_EXIT, L"Exit");
 
     POINT pt;
@@ -223,6 +230,8 @@ void TrayIcon::on_command(UINT cmd) {
     case IDM_MODE_AGGRESSIVE: app->set_mode(Mode::Aggressive); break;
     case IDM_MODE_CUSTOM:     app->set_mode(Mode::Custom); break;
     case IDM_PAUSE:           app->set_paused(!app->paused()); break;
+    case IDM_STATUS:          StatusWindow::show(); return;
+    case IDM_SETTINGS:        SettingsWindow::show(hwnd_); return;
     case IDM_EXIT:            app->request_shutdown(); return;
     }
 
